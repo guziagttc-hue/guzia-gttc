@@ -1,0 +1,10 @@
+{
+  "name": "Remix: Remix: Remix: Shondho MFS",
+  "description": "A polished Bangladeshi Mobile Financial Service interface with a modern dark theme and intuitive navigation.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
