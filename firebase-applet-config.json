@@ -1,9 +1,12 @@
 {
-  "projectId": "remixed-project-id",
-  "appId": "remixed-app-id",
-  "apiKey": "remixed-api-key",
-  "authDomain": "remixed-auth-domain",
-  "storageBucket": "remixed-storage-bucket",
-  "messagingSenderId": "remixed-messaging-sender-id",
-  "measurementId": "remixed-measurement-id"
+  "projectId": "potent-sun-15xj8",
+  "appId": "1:34577336157:web:58eb1ee5124dae224c8ab4",
+  "apiKey": "AIzaSyBBoX576am5mrx2OlXsLASW3syIPBwxTY4",
+  "authDomain": "potent-sun-15xj8.firebaseapp.com",
+  "firestoreDatabaseId": "ai-studio-remixremixremixs-49f390d4-bd07-4fb1-9be1-7a5756296817",
+  "storageBucket": "potent-sun-15xj8.firebasestorage.app",
+  "messagingSenderId": "34577336157",
+  "measurementId": "",
+  "oAuthClientId": "34577336157-g52b6tgk1kq7ii2fpgqocac7f9v5a3bv.apps.googleusercontent.com",
+  "recaptchaSiteKey": ""
 }

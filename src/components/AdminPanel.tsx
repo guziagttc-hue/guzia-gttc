@@ -2,7 +2,12 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Users, UserPlus, DollarSign, MessageSquare, ArrowLeft, Bell, CreditCard } from 'lucide-react';
 
-export const AdminPanel = ({ onBack, onAddNotification }: { onBack: () => void, onAddNotification: (title: string, message: string) => void }) => {
+import React from 'react';
+import { motion } from 'motion/react';
+import { Users, UserPlus, DollarSign, MessageSquare, ArrowLeft, Bell, CreditCard } from 'lucide-react';
+import { MoneyRequest } from '../types.ts';
+
+export const AdminPanel = ({ onBack, onAddNotification, moneyRequests }: { onBack: () => void, onAddNotification: (title: string, message: string) => void, moneyRequests: MoneyRequest[] }) => {
   const [offer, setOffer] = React.useState('');
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-4 space-y-6">
@@ -24,10 +29,22 @@ export const AdminPanel = ({ onBack, onAddNotification }: { onBack: () => void, 
           <div className="flex items-center gap-2 mb-2 text-indigo-600"><UserPlus size={20} /> রেজিস্ট্রেশন</div>
           <div className="text-2xl font-bold">৮৫</div>
         </button>
-        <button onClick={() => alert('মানি রিকোয়েস্ট')} className="bg-white p-4 rounded-xl shadow-sm border text-left hover:bg-slate-50 transition">
+        <div className="bg-white p-4 rounded-xl shadow-sm border text-left">
           <div className="flex items-center gap-2 mb-2 text-indigo-600"><DollarSign size={20} /> মানি রিকোয়েস্ট</div>
-          <div className="text-2xl font-bold">১২</div>
-        </button>
+          <div className="text-2xl font-bold">{moneyRequests.length}</div>
+        </div>
+      </div>
+
+      <div className="bg-white p-4 rounded-xl shadow-sm border">
+        <h3 className="font-semibold mb-3">মানি রিকোয়েস্টসমূহ:</h3>
+        <div className="space-y-2">
+            {moneyRequests.map(req => (
+                <div key={req.id} className="p-3 bg-slate-50 rounded-lg text-sm flex justify-between items-center">
+                    <span>{req.agentPhone}: ৳{req.amount}</span>
+                    <span className="text-xs font-bold text-indigo-600">{req.status}</span>
+                </div>
+            ))}
+        </div>
       </div>
 
       <div className="bg-white p-4 rounded-xl shadow-sm border">

@@ -1,4 +1,4 @@
-export type Screen = "registration" | "registration-name" | "registration-id" | "otp" | "pin-setup" | "success" | "login" | "forgot-pin" | "dashboard" | "send-money" | "cash-out" | "merchant-pay" | "my-qr" | "agent-dashboard" | "transaction-history" | "profile" | "request-money" | "notifications" | "admin-request" | "admin-panel";
+export type Screen = "registration" | "registration-name" | "registration-id" | "otp" | "pin-setup" | "success" | "login" | "forgot-pin" | "dashboard" | "send-money" | "cash-out" | "merchant-pay" | "my-qr" | "agent-dashboard" | "transaction-history" | "profile" | "request-money" | "notifications" | "admin-request" | "admin-panel" | "helpline";
 
 export interface UserData {
   phone: string;
@@ -20,5 +20,13 @@ export interface Notification {
   type: "security" | "offer" | "transaction";
   title: string;
   message: string;
+  time: string;
+}
+
+export interface MoneyRequest {
+  id: number;
+  agentPhone: string;
+  amount: number;
+  status: "pending" | "approved" | "rejected";
   time: string;
 }

@@ -16,6 +16,7 @@ import { MyQR } from "./components/MyQR";
 import { AgentDashboard } from "./components/AgentDashboard";
 import { AdminRequest } from "./components/AdminRequest";
 import { AdminPanel } from "./components/AdminPanel";
+import { Helpline } from "./components/Helpline";
 import { TransactionHistory } from "./components/TransactionHistory";
 import { Profile } from "./components/Profile";
 import { Notifications } from "./components/Notifications";
@@ -45,11 +46,16 @@ export default function App() {
     { id: 2, type: "offer", title: "বিশেষ অফার", message: "বিকাশে ক্যাশ-ইন করুন আর পান ২০% ক্যাশব্যাক!", time: "১ ঘণ্টা আগে" },
     { id: 3, type: "transaction", title: "লেনদেন আপডেট", message: "আপনার ৫,০০০ টাকা সফলভাবে সেন্ড মানি হয়েছে।", time: "৩ ঘণ্টা আগে" },
   ]);
+  const [moneyRequests, setMoneyRequests] = useState<any[]>([]);
 
   useEffect(() => {
     const savedTransactions = localStorage.getItem("transactions");
     if (savedTransactions) {
         setTransactions(JSON.parse(savedTransactions));
+    }
+    const savedRequests = localStorage.getItem("moneyRequests");
+    if (savedRequests) {
+        setMoneyRequests(JSON.parse(savedRequests));
     }
     
     const isLoggedIn = localStorage.getItem("isLoggedIn");
@@ -74,6 +80,12 @@ export default function App() {
     const updated = [transaction, ...transactions];
     setTransactions(updated);
     localStorage.setItem("transactions", JSON.stringify(updated));
+  };
+
+  const addMoneyRequest = (request: any) => {
+    const updated = [request, ...moneyRequests];
+    setMoneyRequests(updated);
+    localStorage.setItem("moneyRequests", JSON.stringify(updated));
   };
 
   const addNotification = (title: string, message: string) => {
@@ -188,6 +200,7 @@ export default function App() {
                         };
                         await apiCall('users', 'insert', userToInsert);
                         localStorage.setItem("userPhone", userData.phone);
+                        localStorage.setItem("userPin", tempPin);
                         setUserData({ ...userData, pin: tempPin });
                         updateStep("success");
                       } catch (error: any) {
@@ -303,13 +316,19 @@ export default function App() {
 
           {screen === "admin-request" && (
             <div key="admin-req" className="flex-1 flex flex-col">
-              <AdminRequest onBack={() => updateStep("agent-dashboard")} />
+              <AdminRequest onBack={() => updateStep("agent-dashboard")} onSendRequest={addMoneyRequest} />
             </div>
           )}
 
           {screen === "admin-panel" && (
             <div key="admin-panel" className="flex-1 flex flex-col">
-              <AdminPanel onBack={() => updateStep("agent-dashboard")} onAddNotification={addNotification} />
+              <AdminPanel onBack={() => updateStep("agent-dashboard")} onAddNotification={addNotification} moneyRequests={moneyRequests} />
+            </div>
+          )}
+
+          {screen === "helpline" && (
+            <div key="helpline" className="flex-1 flex flex-col">
+              <Helpline onBack={() => updateStep("agent-dashboard")} />
             </div>
           )}
 

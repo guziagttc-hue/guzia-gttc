@@ -13,7 +13,8 @@ import {
   LogOut,
   Check,
   User,
-  DollarSign
+  DollarSign,
+  HelpCircle
 } from "lucide-react";
 
 interface AgentStats {
@@ -24,7 +25,6 @@ interface AgentStats {
 }
 
 export const AgentDashboard = ({ onBack, onNavigate }: { onBack: () => void; onNavigate: (screen: Screen) => void }) => {
-  const [clickCount, setClickCount] = useState(0);
   const [stats] = useState<AgentStats>({
     commission: "৳ ১,৪৫০.০০",
     totalCashIn: "৳ ৪৫,০০০.০০",
@@ -38,14 +38,7 @@ export const AgentDashboard = ({ onBack, onNavigate }: { onBack: () => void; onN
       <div className="bg-[#0b2240] pt-12 pb-24 px-6 rounded-b-[40px] relative text-white">
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-3">
-            <div onClick={() => {
-              const count = clickCount + 1;
-              setClickCount(count);
-              if (count >= 5) {
-                setClickCount(0);
-                onNavigate("admin-panel" as Screen);
-              }
-            }} className="w-10 h-10 bg-amber-400 rounded-xl flex items-center justify-center text-[#0b2240] shadow-lg relative cursor-pointer">
+            <div onClick={() => onNavigate("admin-panel" as Screen)} className="w-10 h-10 bg-amber-400 rounded-xl flex items-center justify-center text-[#0b2240] shadow-lg relative cursor-pointer">
               <User size={24} />
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-[#0b2240] rounded-full flex items-center justify-center">
                 <Check size={8} className="text-white" strokeWidth={4} />
@@ -56,7 +49,7 @@ export const AgentDashboard = ({ onBack, onNavigate }: { onBack: () => void; onN
                 <h1 className="text-base font-bold leading-none">এজেন্ট ড্যাশবোর্ড</h1>
                 <span className="bg-emerald-500/20 text-emerald-400 text-[8px] font-black uppercase px-1.5 py-0.5 rounded border border-emerald-500/30">Verified</span>
               </div>
-              <p className="text-amber-400 text-[10px] font-bold tracking-widest uppercase mt-1">সন্ধ্যা এজেন্ট পয়েন্ট</p>
+              <button onClick={() => onNavigate("admin-panel" as Screen)} className="text-amber-400 text-[10px] font-bold tracking-widest uppercase mt-1 hover:text-amber-300 transition">সন্ধ্যা এজেন্ট পয়েন্ট</button>
             </div>
           </div>
           <button 
@@ -106,6 +99,7 @@ export const AgentDashboard = ({ onBack, onNavigate }: { onBack: () => void; onN
             <AgentTool icon={<ArrowDownLeft size={20} />} label="বি২বি" color="bg-blue-50 text-blue-600" />
             <AgentTool icon={<Users size={20} />} label="ইউজার" color="bg-amber-50 text-amber-600" />
             <AgentTool icon={<DollarSign size={20} />} label="টাকা চান" color="bg-indigo-50 text-indigo-600" onClick={() => onNavigate("admin-request" as Screen)} />
+            <AgentTool icon={<HelpCircle size={20} />} label="হেল্পলাইন" color="bg-rose-50 text-rose-600" onClick={() => onNavigate("helpline" as Screen)} />
           </div>
         </div>
 
