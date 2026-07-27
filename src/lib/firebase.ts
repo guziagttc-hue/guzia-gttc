@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, get, set, update, child, runTransaction } from "firebase/database";
+import { UserData } from "../types";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDFafiWmm9B_IZfejnLsAqM5WSKnFx-_QE",
@@ -39,6 +40,19 @@ export const findUserByContact = async (contact: string) => {
     const usersSnapshot = await get(child(dbRef, 'users'));
     const users = usersSnapshot.val() || [];
     return users.find((u: any) => u.email === contact.trim().toLowerCase()) || null;
+};
+
+export const updateUser = async (userId: string, updatedData: Partial<UserData>) => {
+    const usersRef = ref(db, 'users');
+    return await runTransaction(usersRef, (users) => {
+        if (!users) return null;
+        const userIndex = users.findIndex((u: any) => u.id === userId);
+        if (userIndex === -1) {
+            throw new Error("ইউজার খুঁজে পাওয়া যায়নি!");
+        }
+        users[userIndex] = { ...users[userIndex], ...updatedData };
+        return users;
+    });
 };
 
 export const transferMoney = async (senderId: string, receiverId: string, amount: number) => {

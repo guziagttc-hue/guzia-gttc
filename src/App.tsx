@@ -20,10 +20,12 @@ import { TransactionHistory } from "./components/TransactionHistory";
 import { Profile } from "./components/Profile";
 import { Notifications } from "./components/Notifications";
 import { RequestMoneyFlow } from "./components/RequestMoneyFlow";
-import { createUser, findUserByContact } from "./lib/firebase";
+import { RegistrationDetails } from "./components/RegistrationDetails";
+import { createUser, findUserByContact, updateUser } from "./lib/firebase";
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("login");
+  const [pendingUserData, setPendingUserData] = useState<Partial<UserData>>({});
   const [modal, setModal] = useState<{ isOpen: boolean, title: string, message: string }>({ isOpen: false, title: '', message: '' });
   const [userData, setUserData] = useState<UserData>({
     email: "",
@@ -120,8 +122,17 @@ export default function App() {
                 }
               }}
               onRegister={async (email, password, name) => {
+                setPendingUserData({ email, password_hash: password, name, role: 'user' });
+                setScreen('registration-details');
+              }}
+            />
+          )}
+
+          {screen === "registration-details" && (
+            <RegistrationDetails 
+              onComplete={async (idNumber, phoneNumber) => {
                 try {
-                    await createUser({ email, name, password_hash: password, role: 'user' });
+                    await createUser({ ...pendingUserData, idCard: idNumber, phone: phoneNumber } as any);
                     setModal({ isOpen: true, title: "সফল", message: "রেজিস্ট্রেশন সফল হয়েছে!" });
                     setScreen('login');
                 } catch (e: any) {
@@ -260,13 +271,19 @@ export default function App() {
           {screen === "profile" && (
             <Profile 
               userData={userData}
+              balance={formatBalance(balance)}
               onBack={() => updateStep("dashboard")}
               onLogout={() => {
                 localStorage.removeItem("isLoggedIn");
                 localStorage.removeItem("userContact");
                 setScreen("login");
               }}
-              onUpdateUser={(data) => setUserData({ ...userData, ...data })}
+              onUpdateUser={async (data) => {
+                if (userData.id) {
+                    await updateUser(userData.id, data);
+                    setUserData({ ...userData, ...data });
+                }
+              }}
             />
           )}
         </AnimatePresence>

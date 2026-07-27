@@ -1,9 +1,10 @@
-export type Screen = "registration" | "login" | "dashboard" | "send-money" | "cash-out" | "merchant-pay" | "my-qr" | "agent-dashboard" | "transaction-history" | "profile" | "request-money" | "notifications" | "admin-request" | "admin-panel" | "helpline";
+export type Screen = "registration" | "login" | "registration-details" | "dashboard" | "send-money" | "cash-out" | "merchant-pay" | "my-qr" | "agent-dashboard" | "transaction-history" | "profile" | "request-money" | "notifications" | "admin-request" | "admin-panel" | "helpline";
 
 export interface UserData {
   id?: string;
   email: string;
   name: string;
+  phone?: string;
   district?: string;
   thana?: string;
   union?: string;
@@ -13,6 +14,7 @@ export interface UserData {
   address?: string;
   profilePictureUrl?: string;
   idCardUrl?: string;
+  idCardNumber?: string;
 }
 
 export interface Notification {

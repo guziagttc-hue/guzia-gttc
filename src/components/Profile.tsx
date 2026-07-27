@@ -16,40 +16,33 @@ import {
   Database
 } from "lucide-react";
 import { UserData } from "../types";
-import { googleSignIn, initAuth, getAccessToken, logout } from "../lib/auth";
 
 export const Profile = ({ 
   userData, 
+  balance,
   onBack, 
   onLogout,
   onUpdateUser
 }: { 
   userData: UserData, 
+  balance: string,
   onBack: () => void,
   onLogout: () => void,
   onUpdateUser: (data: Partial<UserData>) => void
 }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedData, setEditedData] = useState<Partial<UserData>>(userData);
   const [needsAuth, setNeedsAuth] = useState(true);
-  const [token, setToken] = useState<string | null>(null);
 
-  useEffect(() => {
-    initAuth();
-  }, []);
-
-  const handleLogin = async () => {
-    try {
-      const result = await googleSignIn();
-      if (result) {
-        // Handle result accordingly, maybe result.accessToken? 
-        // Need to check the type if result exists.
-        // Assuming result as any for now to bypass 'never' error
-        setToken((result as any).accessToken);
-        setNeedsAuth(false);
-      }
-    } catch (err) {
-      console.error('Login failed:', err);
-    }
+  const handleSave = () => {
+    onUpdateUser(editedData);
+    setIsEditing(false);
   };
+
+  const handleInputChange = (field: keyof UserData, value: string) => {
+    setEditedData(prev => ({ ...prev, [field]: value }));
+  };
+
   return (
     <div className="flex-1 flex flex-col bg-slate-50 h-screen overflow-y-auto">
       {/* Profile Header */}
@@ -95,7 +88,7 @@ export const Profile = ({
            <div className="bg-white rounded-3xl p-4 sm:p-5 shadow-xl border border-slate-100 flex justify-between items-center">
               <div>
                 <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">বর্তমান ব্যালেন্স</p>
-                <h4 className="text-lg sm:text-xl font-black text-[#0b2240]">৳ ০.০০</h4>
+                <h4 className="text-lg sm:text-xl font-black text-[#0b2240]">{balance}</h4>
               </div>
 
            </div>
@@ -130,18 +123,55 @@ export const Profile = ({
         <div className="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 space-y-4">
            <div className="flex justify-between items-start">
              <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ব্যক্তিগত তথ্য</h4>
-             <button className="text-[10px] font-bold text-blue-600">এডিট করুন</button>
+             {isEditing ? (
+               <div className="flex gap-2">
+                  <button onClick={() => setIsEditing(false)} className="text-[10px] font-bold text-slate-400">বাতিল</button>
+                  <button onClick={handleSave} className="text-[10px] font-bold text-emerald-600">সংরক্ষণ</button>
+               </div>
+             ) : (
+               <button onClick={() => setIsEditing(true)} className="text-[10px] font-bold text-blue-600">এডিট করুন</button>
+             )}
            </div>
-           <div className="flex items-center gap-4 pt-4 border-t border-slate-50">
-              <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400">
-                <Mail size={18} />
-              </div>
-              <div>
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">ইমেইল এড্রেস</p>
-                <p className="text-xs font-bold text-slate-700">{userData.email}</p>
-              </div>
-           </div>
+           
+           {isEditing ? (
+             <div className="space-y-3 pt-4 border-t border-slate-50">
+                <input value={editedData.name} onChange={(e) => handleInputChange("name", e.target.value)} className="w-full p-2 border rounded" placeholder="নাম" />
+                <input 
+                  value={editedData.phone || ""} 
+                  onChange={(e) => handleInputChange("phone", e.target.value)} 
+                  className="w-full p-2 border rounded" 
+                  placeholder="ফোন নম্বর" 
+                  disabled={!!userData.phone}
+                />
+                <input value={editedData.district || ""} onChange={(e) => handleInputChange("district", e.target.value)} className="w-full p-2 border rounded" placeholder="জেলা" />
+                <input value={editedData.thana || ""} onChange={(e) => handleInputChange("thana", e.target.value)} className="w-full p-2 border rounded" placeholder="থানা" />
+                <input value={editedData.union || ""} onChange={(e) => handleInputChange("union", e.target.value)} className="w-full p-2 border rounded" placeholder="ইউনিয়ন" />
+                <input value={editedData.address || ""} onChange={(e) => handleInputChange("address", e.target.value)} className="w-full p-2 border rounded" placeholder="ঠিকানা" />
+             </div>
+           ) : (
+             <div className="pt-4 border-t border-slate-50 space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400">
+                    <Mail size={18} />
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">ইমেইল এড্রেস</p>
+                    <p className="text-xs font-bold text-slate-700">{userData.email}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400">
+                    <Phone size={18} />
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">ফোন নম্বর</p>
+                    <p className="text-xs font-bold text-slate-700">{userData.phone || "N/A"}</p>
+                  </div>
+                </div>
+             </div>
+           )}
         </div>
+
 
         {/* Transaction Limits */}
         <div className="bg-emerald-50 rounded-3xl p-5 border border-emerald-100">
@@ -177,7 +207,7 @@ export const Profile = ({
           <div className="bg-white rounded-[32px] overflow-hidden shadow-sm border border-slate-100">
             {needsAuth ? (
               <button 
-                onClick={handleLogin}
+                onClick={() => alert("এই ফিচারটি শীঘ্রই আসছে!")}
                 className="w-full flex items-center justify-between p-4 hover:bg-slate-50 transition border-b border-slate-50 last:border-0 group"
               >
                 <div className="flex items-center gap-4">
