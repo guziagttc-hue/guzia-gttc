@@ -81,8 +81,13 @@ export const AgentDashboard = ({ onBack, onNavigate }: { onBack: () => void; onN
     try {
         await transferMoney(SENDER_ID, user!.id, parseFloat(amount));
         alert(`${amount} টাকা ${user!.name}-কে সফলভাবে পাঠানো হয়েছে!`);
+        
+        // Refresh user data after transfer
+        const updatedUser = await findUserByContact(user!.email);
+        if (updatedUser) setUser(updatedUser);
+        
         setAmount("");
-        setUser(null);
+        // setUser(null); // Keep user selected to show updated balance
     } catch (error) {
         console.error(error);
         alert("লেনদেন ব্যর্থ হয়েছে: " + error);

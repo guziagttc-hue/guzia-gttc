@@ -241,7 +241,7 @@ export const RequestMoneyFlow = ({
                               const currentBal = parseInt(balance.replace(/[^\d]/g, ""));
                               const reqAmt = parseInt(amount);
                               const newBal = currentBal - reqAmt;
-                              onComplete(`৳ ${newBal.toLocaleString()}.৫০`);
+                              onComplete(reqAmt);
                            } else {
                               setError("ভুল পিন, আবার চেষ্টা করুন");
                               setPin("");

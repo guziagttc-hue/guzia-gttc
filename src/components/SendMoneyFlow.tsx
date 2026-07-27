@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronLeft, User, Search, Star, Check } from "lucide-react";
 import { Keypad, PinDisplay } from "./AuthCommon";
-import { findUserByContact } from "../lib/firebase";
+import { findUserByContact, transferMoney } from "../lib/firebase";
 interface Contact {
   name: string;
   identifier: string;
@@ -11,7 +11,7 @@ interface Contact {
   isPriyo: boolean;
 }
 
-export const SendMoneyFlow = ({ balance, onComplete, onCancel, addTransaction, userPin }: { balance: string, onComplete: (newBalance: number) => void, onCancel: () => void, addTransaction: (t: any) => void, userPin: string }) => {
+export const SendMoneyFlow = ({ balance, onComplete, onCancel, addTransaction, userPin, senderEmail }: { balance: string, onComplete: (newBalance: number) => void, onCancel: () => void, addTransaction: (t: any) => void, userPin: string, senderEmail: string }) => {
   const [step, setStep] = useState<"input" | "review" | "success">("input");
   const [recipient, setRecipient] = useState<Contact | null>(null);
   const [manualInput, setManualInput] = useState("");
@@ -45,19 +45,29 @@ export const SendMoneyFlow = ({ balance, onComplete, onCancel, addTransaction, u
     setStep("review");
   };
 
-  const handleSuccess = () => {
-      addTransaction({
-          id: txnId,
-          name: recipient?.name,
-          type: "send",
-          status: "সফল",
-          date: new Date().toLocaleDateString('bn-BD'),
-          amount: numAmount.toString(),
-          color: "text-rose-500",
-          iconBg: "bg-rose-50"
-      });
-      onComplete(numAmount);
-      setStep("success");
+  const handleSuccess = async () => {
+      try {
+          // Perform transfer
+          const recipientUser = await findUserByContact(recipient!.identifier);
+          if (!recipientUser) throw new Error("প্রাপক খুঁজে পাওয়া যায়নি");
+          
+          await transferMoney(senderEmail, recipientUser.id, numAmount);
+          
+          addTransaction({
+              id: txnId,
+              name: recipient?.name,
+              type: "send",
+              status: "সফল",
+              date: new Date().toLocaleDateString('bn-BD'),
+              amount: numAmount.toString(),
+              color: "text-rose-500",
+              iconBg: "bg-rose-50"
+          });
+          onComplete(numAmount);
+          setStep("success");
+      } catch (e: any) {
+          setError(e.message);
+      }
   };
 
   const handlePasswordSubmit = () => {

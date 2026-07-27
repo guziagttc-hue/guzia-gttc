@@ -1,10 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Users, UserPlus, DollarSign, MessageSquare, ArrowLeft, Bell, CreditCard } from 'lucide-react';
-
-import React from 'react';
-import { motion } from 'motion/react';
-import { Users, UserPlus, DollarSign, MessageSquare, ArrowLeft, Bell, CreditCard } from 'lucide-react';
 import { MoneyRequest } from '../types.ts';
 
 export const AdminPanel = ({ onBack, onAddNotification, moneyRequests }: { onBack: () => void, onAddNotification: (title: string, message: string) => void, moneyRequests: MoneyRequest[] }) => {

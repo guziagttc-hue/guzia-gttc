@@ -65,6 +65,7 @@ export default function App() {
                   role: user.role,
                   biometricEnabled: user.biometric_enabled
                 });
+                setBalance(user.balance || 0); // Set balance from user object
                 setScreen("dashboard");
             }
         });
@@ -190,6 +191,7 @@ export default function App() {
               balance={formatBalance(balance)} 
               addTransaction={addTransaction}
               userPin={userData.password}
+              senderEmail={userData.email}
               onCancel={() => updateStep("dashboard")}
               onComplete={(amount) => {
                 setBalance(balance - amount);

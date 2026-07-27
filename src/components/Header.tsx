@@ -50,9 +50,9 @@ export const Header = ({
               <p className="text-[9px] text-slate-300 leading-none">গ্রাহক</p>
               {userData?.name && <p className="text-[10px] text-white font-semibold">{userData.name}</p>}
             </div>
-            {userData?.avatarUrl ? (
+            {userData?.profilePictureUrl ? (
               <img 
-                src={userData.avatarUrl} 
+                src={userData.profilePictureUrl} 
                 alt="User" 
                 className="w-7 h-7 rounded-full object-cover border border-amber-400"
                 referrerPolicy="no-referrer"
