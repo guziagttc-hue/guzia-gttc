@@ -4,9 +4,17 @@ export interface UserData {
   id?: string;
   email: string;
   name: string;
+  nameBn?: string;
+  nameEn?: string;
+  fatherName?: string;
+  motherName?: string;
+  dateOfBirth?: string;
+  nidNumber?: string;
   phone?: string;
-  district?: string;
+  village?: string;
+  postOffice?: string;
   thana?: string;
+  district?: string;
   union?: string;
   password?: string;
   role: 'user' | 'agent';

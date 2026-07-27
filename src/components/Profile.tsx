@@ -16,6 +16,7 @@ import {
   Database
 } from "lucide-react";
 import { UserData } from "../types";
+import { useTranslation } from "../context/LanguageContext";
 
 export const Profile = ({ 
   userData, 
@@ -32,6 +33,7 @@ export const Profile = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState<Partial<UserData>>(userData);
+  const { language, toggleLanguage } = useTranslation();
   const [needsAuth, setNeedsAuth] = useState(true);
 
   const handleSave = () => {
@@ -232,7 +234,9 @@ export const Profile = ({
           <div className="bg-white rounded-[32px] overflow-hidden shadow-sm border border-slate-100">
              <ProfileMenuItem icon={<ShieldCheck size={18} />} label="নিরাপত্তা ও পিন পরিবর্তন" color="text-emerald-500" />
              <ProfileMenuItem icon={<Award size={18} />} label="রেফার করুন ও আয় করুন" color="text-amber-500" />
-             <ProfileMenuItem icon={<Settings size={18} />} label="অ্যাপ সেটিংস ও ভাষা" color="text-blue-500" />
+             <button onClick={toggleLanguage} className="w-full">
+                <ProfileMenuItem label={`ভাষা: ${language === 'bn' ? 'বাংলা' : 'English'}`} color="text-blue-500" />
+             </button>
              <ProfileMenuItem icon={<HelpCircle size={18} />} label="হেল্প ও কাস্টমার সাপোর্ট" color="text-indigo-500" />
           </div>
         </div>
@@ -254,12 +258,14 @@ export const Profile = ({
   );
 };
 
-const ProfileMenuItem = ({ icon, label, color }: { icon: React.ReactNode, label: string, color: string }) => (
+const ProfileMenuItem = ({ icon, label, color }: { icon?: React.ReactNode, label: string, color: string }) => (
   <button className="w-full flex items-center justify-between p-4 hover:bg-slate-50 transition border-b border-slate-50 last:border-0 group">
     <div className="flex items-center gap-4">
-      <div className={`w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center ${color} group-hover:scale-110 transition`}>
-        {icon}
-      </div>
+      {icon && (
+        <div className={`w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center ${color} group-hover:scale-110 transition`}>
+          {icon}
+        </div>
+      )}
       <span className="text-xs font-bold text-slate-700">{label}</span>
     </div>
     <ChevronRight size={16} className="text-slate-300" />

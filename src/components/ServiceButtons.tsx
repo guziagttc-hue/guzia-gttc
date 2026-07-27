@@ -65,6 +65,8 @@ export const RequestMoneyButton = ({ delay = 0.4, onClick }: ServiceProps & { on
   </motion.div>
 );
 
+// Remove AgentDashboardButton export
+
 export const ServiceGrid = ({ onSendMoney, onCashOut, onMerchantPay, onRequestMoney }: { 
   onSendMoney?: () => void; 
   onCashOut?: () => void;

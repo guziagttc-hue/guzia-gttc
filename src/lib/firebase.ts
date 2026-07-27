@@ -39,7 +39,7 @@ export const findUserByContact = async (contact: string) => {
     const dbRef = ref(db);
     const usersSnapshot = await get(child(dbRef, 'users'));
     const users = usersSnapshot.val() || [];
-    return users.find((u: any) => u.email === contact.trim().toLowerCase()) || null;
+    return users.find((u: any) => u.email === contact.trim().toLowerCase() || u.phone === contact.trim()) || null;
 };
 
 export const updateUser = async (userId: string, updatedData: Partial<UserData>) => {
@@ -50,7 +50,10 @@ export const updateUser = async (userId: string, updatedData: Partial<UserData>)
         if (userIndex === -1) {
             throw new Error("ইউজার খুঁজে পাওয়া যায়নি!");
         }
-        users[userIndex] = { ...users[userIndex], ...updatedData };
+        users[userIndex] = { 
+            ...users[userIndex], 
+            ...Object.fromEntries(Object.entries(updatedData).filter(([_, v]) => v !== undefined)) 
+        };
         return users;
     });
 };

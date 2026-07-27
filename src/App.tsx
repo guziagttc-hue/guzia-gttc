@@ -22,7 +22,7 @@ import { Notifications } from "./components/Notifications";
 import { RequestMoneyFlow } from "./components/RequestMoneyFlow";
 import { RegistrationDetails } from "./components/RegistrationDetails";
 import { createUser, findUserByContact, updateUser } from "./lib/firebase";
-
+import { LanguageProvider } from "./context/LanguageContext";
 export default function App() {
   const [screen, setScreen] = useState<Screen>("login");
   const [pendingUserData, setPendingUserData] = useState<Partial<UserData>>({});
@@ -61,14 +61,11 @@ export default function App() {
                   id: user.id,
                   email: user.email,
                   name: user.name,
-                  district: user.district,
-                  thana: user.thana,
-                  union: user.union,
                   password: user.password_hash,
                   role: user.role,
                   biometricEnabled: user.biometric_enabled
                 });
-                setBalance(user.balance || 0); // Set balance from user object
+                setBalance(user.balance || 0);
                 setScreen("dashboard");
             }
         });
@@ -97,198 +94,200 @@ export default function App() {
   const updateStep = (next: Screen) => setScreen(next);
 
   return (
-    <div className="bg-slate-50 min-h-screen flex justify-center text-slate-800 font-sans">
-      <Modal {...modal} onClose={() => setModal({ ...modal, isOpen: false })} />
-      <div className="w-full max-w-lg bg-white min-h-screen relative flex flex-col shadow-sm overflow-hidden">
-        <AnimatePresence mode="wait">
-          {screen === "login" && (
-            <AuthScreen 
-              onLogin={async (email, password) => {
-                const user = await findUserByContact(email);
-                if (user && user.password_hash === password) {
-                    setUserData({
-                      id: user.id,
-                      email: user.email,
-                      name: user.name,
-                      password: user.password_hash,
-                      role: user.role,
-                    });
-                    localStorage.setItem("isLoggedIn", "true");
-                    localStorage.setItem("userContact", user.email);
-                    setModal({ isOpen: true, title: "সফল", message: "লগইন সফল হয়েছে!" });
-                    updateStep(user.role === "agent" ? "agent-dashboard" : "dashboard");
-                } else {
-                    setModal({ isOpen: true, title: "ত্রুটি", message: "ভুল ইমেইল বা পাসওয়ার্ড!" });
-                }
-              }}
-              onRegister={async (email, password, name) => {
-                setPendingUserData({ email, password_hash: password, name, role: 'user' });
-                setScreen('registration-details');
-              }}
-            />
-          )}
+    <LanguageProvider>
+        <div className="bg-slate-50 min-h-screen flex justify-center text-slate-800 font-sans">
+            <Modal {...modal} onClose={() => setModal({ ...modal, isOpen: false })} />
+            <div className="w-full max-w-lg bg-white min-h-screen relative flex flex-col shadow-sm overflow-hidden">
+                <AnimatePresence mode="wait">
+                  {screen === "login" && (
+                    <AuthScreen 
+                      onLogin={async (email, password) => {
+                        const user = await findUserByContact(email);
+                        if (user && user.password_hash === password) {
+                            setUserData({
+                              id: user.id,
+                              email: user.email,
+                              name: user.name,
+                              password: user.password_hash,
+                              role: user.role,
+                            });
+                            localStorage.setItem("isLoggedIn", "true");
+                            localStorage.setItem("userContact", user.email);
+                            setModal({ isOpen: true, title: "সফল", message: "লগইন সফল হয়েছে!" });
+                            updateStep(user.role === "agent" ? "agent-dashboard" : "dashboard");
+                        } else {
+                            setModal({ isOpen: true, title: "ত্রুটি", message: "ভুল ইমেইল বা পাসওয়ার্ড!" });
+                        }
+                      }}
+                      onRegister={async (email, password, name, role) => {
+                        setPendingUserData({ email, password_hash: password, name, role: role as 'user' | 'agent' });
+                        setScreen('registration-details');
+                      }}
+                    />
+                  )}
 
-          {screen === "registration-details" && (
-            <RegistrationDetails 
-              onComplete={async (idNumber, phoneNumber) => {
-                try {
-                    await createUser({ ...pendingUserData, idCard: idNumber, phone: phoneNumber } as any);
-                    setModal({ isOpen: true, title: "সফল", message: "রেজিস্ট্রেশন সফল হয়েছে!" });
-                    setScreen('login');
-                } catch (e: any) {
-                    setModal({ isOpen: true, title: "ত্রুটি", message: e.message });
-                }
-              }}
-            />
-          )}
+                  {screen === "registration-details" && (
+                    <RegistrationDetails 
+                      onComplete={async (data) => {
+                        try {
+                            await createUser({ ...pendingUserData, ...data } as any);
+                            setModal({ isOpen: true, title: "সফল", message: "রেজিস্ট্রেশন সফল হয়েছে!" });
+                            setScreen('login');
+                        } catch (e: any) {
+                            setModal({ isOpen: true, title: "ত্রুটি", message: e.message });
+                        }
+                      }}
+                    />
+                  )}
 
-          {screen === "dashboard" && (
-            <motion.div key="dash" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 flex flex-col">
-              <Header 
-                balance={formatBalance(balance)} 
-                onQRClick={() => updateStep("my-qr")} 
-                onNotificationClick={() => updateStep("notifications")}
-                userData={userData}
-              />
-              <ServiceGrid 
-                onSendMoney={() => updateStep("send-money")} 
-                onCashOut={() => updateStep("cash-out")}
-                onMerchantPay={() => updateStep("merchant-pay")}
-                onRequestMoney={() => updateStep("request-money")}
-              />
-              <RecentTransactions onSeeAll={() => updateStep("transaction-history")} />
-              <div className="h-24" />
-              <BottomNav 
-                onAgentClick={() => updateStep("agent-dashboard")} 
-                onProfileClick={() => updateStep("profile")}
-                onHistoryClick={() => updateStep("transaction-history")}
-              />
-            </motion.div>
-          )}
+                  {screen === "dashboard" && (
+                    <motion.div key="dash" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 flex flex-col">
+                      <Header 
+                        balance={formatBalance(balance)} 
+                        onQRClick={() => updateStep("my-qr")} 
+                        onNotificationClick={() => updateStep("notifications")}
+                        userData={userData}
+                      />
+                      <ServiceGrid 
+                        onSendMoney={() => updateStep("send-money")} 
+                        onCashOut={() => updateStep("cash-out")}
+                        onMerchantPay={() => updateStep("merchant-pay")}
+                        onRequestMoney={() => updateStep("request-money")}
+                      />
+                      <RecentTransactions onSeeAll={() => updateStep("transaction-history")} />
+                      <div className="h-24" />
+                      <BottomNav 
+                        onAgentClick={() => updateStep("agent-dashboard")} 
+                        onProfileClick={() => updateStep("profile")}
+                        onHistoryClick={() => updateStep("transaction-history")}
+                      />
+                    </motion.div>
+                  )}
 
-          {screen === "agent-dashboard" && (
-            <motion.div key="agent-dash" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 flex flex-col">
-              <AgentDashboard 
-                onBack={() => updateStep("dashboard")}
-                onNavigate={(s) => updateStep(s)}
-              />
-              <div className="h-24" />
-              <BottomNav 
-                onAgentClick={() => updateStep("agent-dashboard")} 
-                onProfileClick={() => updateStep("profile")}
-                onHistoryClick={() => updateStep("transaction-history")}
-              />
-            </motion.div>
-          )}
+                  {screen === "agent-dashboard" && (
+                    <motion.div key="agent-dash" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 flex flex-col">
+                      <AgentDashboard 
+                        onBack={() => updateStep("dashboard")}
+                        onNavigate={(s) => updateStep(s)}
+                      />
+                      <div className="h-24" />
+                      <BottomNav 
+                        onAgentClick={() => updateStep("agent-dashboard")} 
+                        onProfileClick={() => updateStep("profile")}
+                        onHistoryClick={() => updateStep("transaction-history")}
+                      />
+                    </motion.div>
+                  )}
 
-          {screen === "admin-request" && (
-            <div key="admin-req" className="flex-1 flex flex-col">
-              <AdminRequest onBack={() => updateStep("agent-dashboard")} onSendRequest={() => {}} />
+                  {screen === "admin-request" && (
+                    <div key="admin-req" className="flex-1 flex flex-col">
+                      <AdminRequest onBack={() => updateStep("agent-dashboard")} onSendRequest={() => {}} />
+                    </div>
+                  )}
+
+                  {screen === "admin-panel" && (
+                    <div key="admin-panel" className="flex-1 flex flex-col">
+                      <AdminPanel onBack={() => updateStep("agent-dashboard")} onAddNotification={addNotification} moneyRequests={moneyRequests} />
+                    </div>
+                  )}
+
+                  {screen === "helpline" && (
+                    <div key="helpline" className="flex-1 flex flex-col">
+                      <Helpline onBack={() => updateStep("agent-dashboard")} />
+                    </div>
+                  )}
+
+                  {screen === "send-money" && (
+                    <SendMoneyFlow 
+                      balance={formatBalance(balance)} 
+                      addTransaction={addTransaction}
+                      userPin={userData.password}
+                      senderId={userData.id!}
+                      onCancel={() => updateStep("dashboard")}
+                      onComplete={(amount) => {
+                        setBalance(balance - amount);
+                        updateStep("dashboard");
+                      }}
+                    />
+                  )}
+
+                  {screen === "cash-out" && (
+                    <CashOutFlow 
+                      balance={formatBalance(balance)} 
+                      addTransaction={addTransaction}
+                      userPin={userData.password}
+                      onCancel={() => updateStep("dashboard")}
+                      onComplete={(amount) => {
+                        setBalance(balance - amount);
+                        updateStep("dashboard");
+                      }}
+                    />
+                  )}
+
+                  {screen === "merchant-pay" && (
+                    <MerchantPayFlow 
+                      balance={formatBalance(balance)} 
+                      addTransaction={addTransaction}
+                      userPin={userData.password}
+                      onCancel={() => updateStep("dashboard")}
+                      onComplete={(amount) => {
+                        setBalance(balance - amount);
+                        updateStep("dashboard");
+                      }}
+                    />
+                  )}
+
+                  {screen === "request-money" && (
+                    <RequestMoneyFlow 
+                      balance={formatBalance(balance)} 
+                      addTransaction={addTransaction}
+                      userPin={userData.password}
+                      onCancel={() => updateStep("dashboard")}
+                      onComplete={(amount) => {
+                        setBalance(balance - amount);
+                        updateStep("dashboard");
+                      }}
+                    />
+                  )}
+
+                  {screen === "notifications" && (
+                    <Notifications notifications={notifications} onBack={() => updateStep("dashboard")} />
+                  )}
+
+                  {screen === "my-qr" && (
+                    <MyQR 
+                      name={userData.name}
+                      identifier={userData.phone || userData.email}
+                      onBack={() => updateStep("dashboard")}
+                    />
+                  )}
+
+                  {screen === "transaction-history" && (
+                    <TransactionHistory transactions={transactions} onBack={() => updateStep("dashboard")} />
+                  )}
+
+                  {screen === "profile" && (
+                    <Profile 
+                      userData={userData}
+                      balance={formatBalance(balance)}
+                      onBack={() => updateStep("dashboard")}
+                      onLogout={() => {
+                        localStorage.removeItem("isLoggedIn");
+                        localStorage.removeItem("userContact");
+                        setScreen("login");
+                      }}
+                      onUpdateUser={async (data) => {
+                        if (userData.id) {
+                            await updateUser(userData.id, data);
+                            setUserData({ ...userData, ...data });
+                        }
+                      }}
+                    />
+                  )}
+                </AnimatePresence>
             </div>
-          )}
-
-          {screen === "admin-panel" && (
-            <div key="admin-panel" className="flex-1 flex flex-col">
-              <AdminPanel onBack={() => updateStep("agent-dashboard")} onAddNotification={addNotification} moneyRequests={moneyRequests} />
-            </div>
-          )}
-
-          {screen === "helpline" && (
-            <div key="helpline" className="flex-1 flex flex-col">
-              <Helpline onBack={() => updateStep("agent-dashboard")} />
-            </div>
-          )}
-
-          {screen === "send-money" && (
-            <SendMoneyFlow 
-              balance={formatBalance(balance)} 
-              addTransaction={addTransaction}
-              userPin={userData.password}
-              senderId={userData.id!}
-              onCancel={() => updateStep("dashboard")}
-              onComplete={(amount) => {
-                setBalance(balance - amount);
-                updateStep("dashboard");
-              }}
-            />
-          )}
-
-          {screen === "cash-out" && (
-            <CashOutFlow 
-              balance={formatBalance(balance)} 
-              addTransaction={addTransaction}
-              userPin={userData.password}
-              onCancel={() => updateStep("dashboard")}
-              onComplete={(amount) => {
-                setBalance(balance - amount);
-                updateStep("dashboard");
-              }}
-            />
-          )}
-
-          {screen === "merchant-pay" && (
-            <MerchantPayFlow 
-              balance={formatBalance(balance)} 
-              addTransaction={addTransaction}
-              userPin={userData.password}
-              onCancel={() => updateStep("dashboard")}
-              onComplete={(amount) => {
-                setBalance(balance - amount);
-                updateStep("dashboard");
-              }}
-            />
-          )}
-
-          {screen === "request-money" && (
-            <RequestMoneyFlow 
-              balance={formatBalance(balance)} 
-              addTransaction={addTransaction}
-              userPin={userData.password}
-              onCancel={() => updateStep("dashboard")}
-              onComplete={(amount) => {
-                setBalance(balance - amount);
-                updateStep("dashboard");
-              }}
-            />
-          )}
-
-          {screen === "notifications" && (
-            <Notifications notifications={notifications} onBack={() => updateStep("dashboard")} />
-          )}
-
-          {screen === "my-qr" && (
-            <MyQR 
-              name={userData.name}
-              identifier={userData.phone || userData.email}
-              onBack={() => updateStep("dashboard")}
-            />
-          )}
-
-          {screen === "transaction-history" && (
-            <TransactionHistory transactions={transactions} onBack={() => updateStep("dashboard")} />
-          )}
-
-          {screen === "profile" && (
-            <Profile 
-              userData={userData}
-              balance={formatBalance(balance)}
-              onBack={() => updateStep("dashboard")}
-              onLogout={() => {
-                localStorage.removeItem("isLoggedIn");
-                localStorage.removeItem("userContact");
-                setScreen("login");
-              }}
-              onUpdateUser={async (data) => {
-                if (userData.id) {
-                    await updateUser(userData.id, data);
-                    setUserData({ ...userData, ...data });
-                }
-              }}
-            />
-          )}
-        </AnimatePresence>
-      </div>
-    </div>
+        </div>
+    </LanguageProvider>
   );
 }
 

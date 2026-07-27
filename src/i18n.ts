@@ -1,0 +1,42 @@
+export const translations: any = {
+  en: {
+    login: "Login",
+    register: "Register",
+    welcome: "Welcome",
+    login_sub: "Sign in to your account",
+    name: "Name",
+    email: "Email",
+    password: "Password",
+    confirm_password: "Confirm Password",
+    login_button: "Login",
+    register_button: "Register",
+    forgot_password: "Forgot Password?",
+    terms: "By logging in or registering, you agree to our terms.",
+    has_account: "Already have an account? Login",
+    add_info: "Additional Information",
+    confirm_identity: "Confirm your identity",
+    id_number: "ID Number",
+    phone_number: "Phone Number",
+    save: "Save"
+  },
+  bn: {
+    login: "লগইন",
+    register: "রেজিস্ট্রেশন",
+    welcome: "স্বাগতম",
+    login_sub: "আপনার অ্যাকাউন্টে প্রবেশ করুন",
+    name: "নাম",
+    email: "ইমেইল",
+    password: "পাসওয়ার্ড",
+    confirm_password: "কনফার্ম পাসওয়ার্ড",
+    login_button: "লগইন করুন",
+    register_button: "রেজিস্ট্রেশন করুন",
+    forgot_password: "পাসওয়ার্ড ভুলে গেছেন?",
+    terms: "লগইন বা রেজিস্ট্রেশন করলে আপনি আমাদের শর্তাবলি মেনে নিচ্ছেন।",
+    has_account: "ইতিমধ্যে অ্যাকাউন্ট আছে? লগইন করুন",
+    add_info: "অতিরিক্ত তথ্য",
+    confirm_identity: "আপনার পরিচয় নিশ্চিত করুন",
+    id_number: "আইডি কার্ড নম্বর",
+    phone_number: "ফোন নম্বর",
+    save: "সংরক্ষণ করুন"
+  }
+};

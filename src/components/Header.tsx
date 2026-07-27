@@ -2,6 +2,7 @@ import { motion } from "motion/react";
 import { Eye, QrCode, Bell, User } from "lucide-react";
 import { useState } from "react";
 import { UserData } from "../types";
+import { useTranslation } from "../context/LanguageContext";
 
 export const Header = ({ 
   balance = "৳ ৫,৪২০.৫০", 
@@ -15,6 +16,7 @@ export const Header = ({
   userData?: UserData
 }) => {
   const [showBalance, setShowBalance] = useState(false);
+  const { language, toggleLanguage } = useTranslation();
 
   return (
     <div className="bg-[#0b2240] pt-12 pb-6 px-5 rounded-b-[36px] relative">
