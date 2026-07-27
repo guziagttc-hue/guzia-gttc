@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronLeft, User, Search, Star, Check } from "lucide-react";
 import { Keypad, PinDisplay } from "./AuthCommon";
-
+import { findUserByContact } from "../lib/firebase";
 interface Contact {
   name: string;
   identifier: string;
@@ -11,18 +11,12 @@ interface Contact {
   isPriyo: boolean;
 }
 
-const contacts: Contact[] = [
-  { name: "মা", identifier: "০১৭০০-১১২২৩৩", amount: 1000, avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=80&q=80", isPriyo: true },
-  { name: "ছোট ভাই", identifier: "০১৮১৮-৪৪৫৫৬৬", amount: 500, avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=80&q=80", isPriyo: true },
-  { name: "সাকিব", identifier: "sakib@mail.com", amount: 2000, avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=80&q=80", isPriyo: true },
-];
-
 export const SendMoneyFlow = ({ balance, onComplete, onCancel, addTransaction, userPin }: { balance: string, onComplete: (newBalance: number) => void, onCancel: () => void, addTransaction: (t: any) => void, userPin: string }) => {
   const [step, setStep] = useState<"input" | "review" | "success">("input");
   const [recipient, setRecipient] = useState<Contact | null>(null);
   const [manualInput, setManualInput] = useState("");
   const [amount, setAmount] = useState("");
-  const [pin, setPin] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [txnId] = useState(`txn${Math.random().toString(36).substr(2, 9)}`);
 
@@ -36,18 +30,18 @@ export const SendMoneyFlow = ({ balance, onComplete, onCancel, addTransaction, u
     if (c.amount) setAmount(c.amount.toString());
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (!manualInput) return alert("নম্বর বা ইমেইল লিখুন");
     if (numAmount <= 0) return alert("সঠিক পরিমাণ লিখুন");
     
-    if (!recipient || recipient.identifier !== manualInput) {
-      setRecipient({
-        name: "মোঃ সাজ্জাদ হোসেন",
-        identifier: manualInput,
-        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80",
-        isPriyo: false
-      });
-    }
+    const user = await findUserByContact(manualInput);
+    
+    setRecipient({
+      name: user ? user.name : "অজানা ইউজার",
+      identifier: manualInput,
+      avatar: user?.avatarUrl || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80",
+      isPriyo: false
+    });
     setStep("review");
   };
 
@@ -66,12 +60,12 @@ export const SendMoneyFlow = ({ balance, onComplete, onCancel, addTransaction, u
       setStep("success");
   };
 
-  const handlePinSubmit = () => {
-    if (pin === "1234") {
-      setStep("success");
+  const handlePasswordSubmit = () => {
+    if (password === userPin) {
+      handleSuccess();
     } else {
-      setError("ভুল পিন কোড!");
-      setPin("");
+      setError("ভুল পাসওয়ার্ড!");
+      setPassword("");
     }
   };
 
@@ -124,7 +118,7 @@ export const SendMoneyFlow = ({ balance, onComplete, onCancel, addTransaction, u
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
-          onClick={() => onComplete("৳ ৫,০১৫.৫০")}
+          onClick={() => onComplete(balance ? parseFloat(balance.replace(/[^0-9.]/g, '')) : 0)}
           className="w-full bg-[#0b2240] hover:bg-[#122e54] text-amber-400 font-bold py-4 rounded-2xl shadow-lg transition"
         >
           হোমে ফিরে যান
@@ -169,26 +163,6 @@ export const SendMoneyFlow = ({ balance, onComplete, onCancel, addTransaction, u
                     placeholder="নম্বর বা ইমেইল লিখুন"
                     className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-xs font-bold focus:border-amber-400 focus:outline-none"
                   />
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">প্রিয় মানুষসমূহ</span>
-                <div className="flex gap-4 overflow-x-auto pb-2 no-scrollbar">
-                  {contacts.map((c, i) => (
-                    <button 
-                      key={i} 
-                      onClick={() => handleSelectContact(c)}
-                      className="flex flex-col items-center gap-1 flex-shrink-0 group"
-                    >
-                      <div className="relative">
-                        <img src={c.avatar} alt="" className="w-11 h-11 rounded-full border-2 border-amber-400 group-hover:scale-105 transition" />
-                        <span className="absolute -top-1 -right-1 bg-amber-400 text-slate-900 text-[8px] font-black px-1 rounded-full">⭐</span>
-                      </div>
-                      <span className="text-[10px] font-bold">{c.name}</span>
-                      <span className="text-[8px] text-amber-600 font-bold bg-amber-50 px-1 rounded">৳ {c.amount}</span>
-                    </button>
-                  ))}
                 </div>
               </div>
 
@@ -258,26 +232,22 @@ export const SendMoneyFlow = ({ balance, onComplete, onCancel, addTransaction, u
             </div>
 
             <div className="flex flex-col items-center space-y-4">
-              <p className="text-xs font-semibold text-slate-500">৪ ডিজিটের পিন নম্বর লিখুন</p>
-              <PinDisplay length={4} value={pin} masked />
+              <p className="text-xs font-semibold text-slate-500">পাসওয়ার্ড লিখুন</p>
+              <input 
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="পাসওয়ার্ড লিখুন"
+                className="w-full bg-white border border-slate-200 rounded-xl p-4 text-xs font-bold focus:border-amber-400 focus:outline-none"
+              />
               {error && <p className="text-xs text-rose-500 font-bold">{error}</p>}
             </div>
-
-            <Keypad 
-              onKeyPress={(k) => {
-                if (pin.length < 4) {
-                  const newPin = pin + k;
-                  setPin(newPin);
-                  if (newPin.length === 4) {
-                    setTimeout(() => {
-                      if (newPin === userPin) handleSuccess();
-                      else { setError("ভুল পিন কোড!"); setPin(""); }
-                    }, 500);
-                  }
-                }
-              }}
-              onDelete={() => { setError(""); setPin(pin.slice(0, -1)); }}
-            />
+            <button 
+                onClick={handlePasswordSubmit}
+                className="w-full bg-[#0b2240] text-amber-400 font-bold py-4 rounded-2xl shadow-lg mt-auto"
+            >
+                নিশ্চিত করুন
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
