@@ -168,7 +168,19 @@ export const AgentDashboard = ({ onBack, onNavigate }: { onBack: () => void; onN
           </div>
           {user && (
             <div className="mt-4 p-4 bg-white border border-slate-100 rounded-2xl shadow-sm text-sm">
-              <p className="font-bold text-slate-700 mb-2">ইউজার: {user.name}</p>
+              <div className="flex items-center gap-3 mb-2">
+                  {user.avatarUrl ? (
+                      <img src={user.avatarUrl} alt={user.name} className="w-10 h-10 rounded-full" />
+                  ) : (
+                      <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center font-bold text-slate-500">
+                          {user.name?.charAt(0) || '?'}
+                      </div>
+                  )}
+                  <div>
+                      <p className="font-bold text-slate-700">ইউজার: {user.name}</p>
+                      <p className="text-slate-500 text-xs">{user.email}</p>
+                  </div>
+              </div>
               <p className="text-slate-500 mb-4">বর্তমান ব্যালেন্স: {user.balance || 0} টাকা</p>
               <input 
                 type="number"

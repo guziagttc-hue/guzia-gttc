@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, get, set, update, child } from "firebase/database";
+import { getDatabase, ref, get, set, update, child, runTransaction } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDFafiWmm9B_IZfejnLsAqM5WSKnFx-_QE",
@@ -43,20 +43,27 @@ export const findUserByContact = async (contact: string) => {
 
 export const transferMoney = async (senderId: string, receiverId: string, amount: number) => {
     const dbRef = ref(db);
-    const usersSnapshot = await get(child(dbRef, 'users'));
-    const users = usersSnapshot.val() || [];
-    const sender = users.find((u: any) => u.id === senderId);
-    const receiver = users.find((u: any) => u.id === receiverId);
-
-    if (!sender || !receiver) {
-        throw "ইউজার খুঁজে পাওয়া যায়নি!";
-    }
+    const usersRef = ref(db, 'users');
     
-    if ((sender.balance || 0) < amount) {
-        throw "পর্যাপ্ত ব্যালেন্স নেই!";
-    }
+    // Using transaction to ensure atomic updates
+    return await runTransaction(usersRef, (users) => {
+        if (!users) return null;
 
-    sender.balance = (sender.balance || 0) - amount;
-    receiver.balance = (receiver.balance || 0) + amount;
-    await set(ref(db, 'users'), users);
+        const sender = users.find((u: any) => u.id === senderId);
+        const receiver = users.find((u: any) => u.id === receiverId);
+
+        if (!sender || !receiver) {
+            throw new Error("ইউজার খুঁজে পাওয়া যায়নি!");
+        }
+        
+        if ((sender.balance || 0) < amount) {
+            throw new Error("পর্যাপ্ত ব্যালেন্স নেই!");
+        }
+
+        sender.balance = (sender.balance || 0) - amount;
+        receiver.balance = (receiver.balance || 0) + amount;
+
+        return users;
+    });
 };
+
