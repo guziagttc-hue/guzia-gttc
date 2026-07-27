@@ -11,7 +11,7 @@ interface Contact {
   isPriyo: boolean;
 }
 
-export const SendMoneyFlow = ({ balance, onComplete, onCancel, addTransaction, userPin, senderEmail }: { balance: string, onComplete: (newBalance: number) => void, onCancel: () => void, addTransaction: (t: any) => void, userPin: string, senderEmail: string }) => {
+export const SendMoneyFlow = ({ balance, onComplete, onCancel, addTransaction, userPin, senderId }: { balance: string, onComplete: (newBalance: number) => void, onCancel: () => void, addTransaction: (t: any) => void, userPin: string, senderId: string }) => {
   const [step, setStep] = useState<"input" | "review" | "success">("input");
   const [recipient, setRecipient] = useState<Contact | null>(null);
   const [manualInput, setManualInput] = useState("");
@@ -51,7 +51,7 @@ export const SendMoneyFlow = ({ balance, onComplete, onCancel, addTransaction, u
           const recipientUser = await findUserByContact(recipient!.identifier);
           if (!recipientUser) throw new Error("প্রাপক খুঁজে পাওয়া যায়নি");
           
-          await transferMoney(senderEmail, recipientUser.id, numAmount);
+          await transferMoney(senderId, recipientUser.id, numAmount);
           
           addTransaction({
               id: txnId,

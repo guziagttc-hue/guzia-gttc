@@ -56,6 +56,7 @@ export default function App() {
       findUserByContact(userContact).then(user => {
             if (user) {
                 setUserData({
+                  id: user.id,
                   email: user.email,
                   name: user.name,
                   district: user.district,
@@ -104,6 +105,7 @@ export default function App() {
                 const user = await findUserByContact(email);
                 if (user && user.password_hash === password) {
                     setUserData({
+                      id: user.id,
                       email: user.email,
                       name: user.name,
                       password: user.password_hash,
@@ -191,7 +193,7 @@ export default function App() {
               balance={formatBalance(balance)} 
               addTransaction={addTransaction}
               userPin={userData.password}
-              senderEmail={userData.email}
+              senderId={userData.id!}
               onCancel={() => updateStep("dashboard")}
               onComplete={(amount) => {
                 setBalance(balance - amount);

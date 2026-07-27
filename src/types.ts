@@ -1,6 +1,7 @@
 export type Screen = "registration" | "login" | "dashboard" | "send-money" | "cash-out" | "merchant-pay" | "my-qr" | "agent-dashboard" | "transaction-history" | "profile" | "request-money" | "notifications" | "admin-request" | "admin-panel" | "helpline";
 
 export interface UserData {
+  id?: string;
   email: string;
   name: string;
   district?: string;
