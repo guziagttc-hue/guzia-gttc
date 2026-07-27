@@ -135,15 +135,6 @@ export const Profile = ({
              <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ব্যক্তিগত তথ্য</h4>
              <button className="text-[10px] font-bold text-blue-600">এডিট করুন</button>
            </div>
-           <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400">
-                <Phone size={18} />
-              </div>
-              <div>
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">মোবাইল নম্বর</p>
-                <p className="text-xs font-bold text-slate-700">{userData.phone || "০১৮৯৯-XXXXXX"}</p>
-              </div>
-           </div>
            <div className="flex items-center gap-4 pt-4 border-t border-slate-50">
               <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400">
                 <Mail size={18} />

@@ -1,13 +1,12 @@
-export type Screen = "registration" | "registration-name" | "registration-id" | "otp" | "pin-setup" | "success" | "login" | "forgot-pin" | "dashboard" | "send-money" | "cash-out" | "merchant-pay" | "my-qr" | "agent-dashboard" | "transaction-history" | "profile" | "request-money" | "notifications" | "admin-request" | "admin-panel" | "helpline";
+export type Screen = "registration" | "login" | "dashboard" | "send-money" | "cash-out" | "merchant-pay" | "my-qr" | "agent-dashboard" | "transaction-history" | "profile" | "request-money" | "notifications" | "admin-request" | "admin-panel" | "helpline";
 
 export interface UserData {
-  phone: string;
   email: string;
   name: string;
   district?: string;
   thana?: string;
   union?: string;
-  pin: string;
+  password?: string;
   role: 'user' | 'agent';
   biometricEnabled?: boolean;
   address?: string;

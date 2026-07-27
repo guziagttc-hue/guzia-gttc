@@ -1,6 +1,14 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
 import { Screen } from "../types.ts";
+import { findUserByContact, transferMoney } from "../lib/firebase";
+
+interface User {
+  id: string;
+  name: string;
+  balance: number;
+  [key: string]: any;
+}
 import { 
   LayoutDashboard, 
   Wallet, 
@@ -14,7 +22,8 @@ import {
   Check,
   User,
   DollarSign,
-  HelpCircle
+  HelpCircle,
+  Search
 } from "lucide-react";
 
 interface AgentStats {
@@ -31,6 +40,57 @@ export const AgentDashboard = ({ onBack, onNavigate }: { onBack: () => void; onN
     totalCashOut: "৳ ১২,৫০০.০০",
     activeUsers: 124
   });
+
+  const [contact, setContact] = useState("");
+  const [user, setUser] = useState<User | null>(null);
+  const [searching, setSearching] = useState(false);
+  const [amount, setAmount] = useState("");
+  const [sending, setSending] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  // Temporary sender ID for demo. In production, this should be the authenticated user's ID.
+  const SENDER_ID = "sender_user_id";
+
+  const handleSearch = async () => {
+    setSearching(true);
+    setUser(null);
+    try {
+      const userData = await findUserByContact(contact);
+      if (userData) {
+        setUser(userData);
+      } else {
+        setUser(null);
+        alert("ইউজার পাওয়া যায়নি");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("ত্রুটি হয়েছে");
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const handleSendMoney = async () => {
+    if (!user || !amount) return;
+    
+    setShowConfirm(true);
+  };
+
+  const confirmTransfer = async () => {
+    setSending(true);
+    try {
+        await transferMoney(SENDER_ID, user!.id, parseFloat(amount));
+        alert(`${amount} টাকা ${user!.name}-কে সফলভাবে পাঠানো হয়েছে!`);
+        setAmount("");
+        setUser(null);
+    } catch (error) {
+        console.error(error);
+        alert("লেনদেন ব্যর্থ হয়েছে: " + error);
+    } finally {
+        setSending(false);
+        setShowConfirm(false);
+    }
+  };
 
   return (
     <div className="flex-1 flex flex-col bg-slate-50 min-h-screen text-slate-800">
@@ -91,6 +151,56 @@ export const AgentDashboard = ({ onBack, onNavigate }: { onBack: () => void; onN
       </div>
 
       <div className="mt-20 px-6 space-y-6 pb-24">
+        {/* User Search */}
+        <div>
+          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">ইউজার খুঁজুন</h3>
+          <div className="flex gap-2">
+            <input 
+              type="text"
+              value={contact}
+              onChange={(e) => setContact(e.target.value)}
+              placeholder="মোবাইল বা ইমেইল"
+              className="flex-1 bg-white p-3 rounded-2xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <button onClick={handleSearch} className="bg-[#0b2240] text-white p-3 rounded-2xl">
+              {searching ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div> : <Search size={20} />}
+            </button>
+          </div>
+          {user && (
+            <div className="mt-4 p-4 bg-white border border-slate-100 rounded-2xl shadow-sm text-sm">
+              <p className="font-bold text-slate-700 mb-2">ইউজার: {user.name}</p>
+              <p className="text-slate-500 mb-4">বর্তমান ব্যালেন্স: {user.balance || 0} টাকা</p>
+              <input 
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="পরিমাণ (টাকা)"
+                className="w-full bg-slate-50 p-3 rounded-xl border border-slate-200 mb-3"
+              />
+              <button 
+                onClick={handleSendMoney} 
+                className="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold hover:bg-emerald-700"
+              >
+                টাকা পাঠান
+              </button>
+            </div>
+          )}
+        </div>
+        
+        {/* Confirmation Modal */}
+        {showConfirm && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-6 z-50">
+                <div className="bg-white p-6 rounded-3xl w-full max-w-sm">
+                    <h3 className="font-bold text-lg mb-4">লেনদেন নিশ্চিত করুন</h3>
+                    <p className="text-sm text-slate-600 mb-6">আপনি কি {user?.name}-কে {amount} টাকা পাঠাতে নিশ্চিত?</p>
+                    <div className="flex gap-3">
+                        <button onClick={() => setShowConfirm(false)} className="flex-1 py-3 rounded-xl bg-slate-100 font-bold">না</button>
+                        <button onClick={confirmTransfer} disabled={sending} className="flex-1 py-3 rounded-xl bg-emerald-600 text-white font-bold">{sending ? "পাঠানো হচ্ছে..." : "হ্যাঁ, নিশ্চিত"}</button>
+                    </div>
+                </div>
+            </div>
+        )}
+
         {/* Quick Actions */}
         <div>
           <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">এজেন্ট টুলস</h3>

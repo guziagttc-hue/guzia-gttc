@@ -1,21 +1,62 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
-import { getDatabase } from "firebase/database";
-
+import { getDatabase, ref, get, set, update, child } from "firebase/database";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBoNw3Si5ftl8U_pzSL1xiGVrUxVy5Jbb4",
-  authDomain: "studio-1196607384-437b5.firebaseapp.com",
-  databaseURL: "https://studio-1196607384-437b5-default-rtdb.firebaseio.com",
-  projectId: "studio-1196607384-437b5",
-  storageBucket: "studio-1196607384-437b5.firebasestorage.app",
-  messagingSenderId: "189254743086",
-  appId: "1:189254743086:web:2d220764eeffc5acacdbbf",
-  measurementId: "G-MHE5G9DHD8"
+  apiKey: "AIzaSyDFafiWmm9B_IZfejnLsAqM5WSKnFx-_QE",
+  authDomain: "studio-1919933473-43294.firebaseapp.com",
+  databaseURL: "https://studio-1919933473-43294-default-rtdb.firebaseio.com",
+  projectId: "studio-1919933473-43294",
+  storageBucket: "studio-1919933473-43294.firebasestorage.app",
+  messagingSenderId: "19444598819",
+  appId: "1:19444598819:web:bc507f1c04e0ff7cb60996"
 };
 
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
-export const rtdb = getDatabase(app);
-export const auth = getAuth(app);
+export const db = getDatabase(app);
+
+export const createUser = async (userData: any) => {
+    const dbRef = ref(db);
+    const usersSnapshot = await get(child(dbRef, 'users'));
+    const users = usersSnapshot.val() || [];
+    
+    if (users.find((u: any) => u.email === userData.email.trim().toLowerCase())) {
+        throw new Error("এই ইমেইলে ইতিমধ্যে একটি একাউন্ট আছে!");
+    }
+    const newUser = {
+        ...userData,
+        id: Date.now().toString(),
+        email: userData.email.trim().toLowerCase(),
+        balance: 1000, // Initial balance
+        createdAt: new Date().toISOString()
+    };
+    users.push(newUser);
+    await set(ref(db, 'users'), users);
+    return newUser;
+};
+
+export const findUserByContact = async (contact: string) => {
+    const dbRef = ref(db);
+    const usersSnapshot = await get(child(dbRef, 'users'));
+    const users = usersSnapshot.val() || [];
+    return users.find((u: any) => u.email === contact.trim().toLowerCase()) || null;
+};
+
+export const transferMoney = async (senderId: string, receiverId: string, amount: number) => {
+    const dbRef = ref(db);
+    const usersSnapshot = await get(child(dbRef, 'users'));
+    const users = usersSnapshot.val() || [];
+    const sender = users.find((u: any) => u.id === senderId);
+    const receiver = users.find((u: any) => u.id === receiverId);
+
+    if (!sender || !receiver) {
+        throw "ইউজার খুঁজে পাওয়া যায়নি!";
+    }
+    
+    if ((sender.balance || 0) < amount) {
+        throw "পর্যাপ্ত ব্যালেন্স নেই!";
+    }
+
+    sender.balance = (sender.balance || 0) - amount;
+    receiver.balance = (receiver.balance || 0) + amount;
+    await set(ref(db, 'users'), users);
+};
