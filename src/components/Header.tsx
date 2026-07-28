@@ -7,11 +7,13 @@ import { useTranslation } from "../context/LanguageContext";
 export const Header = ({ 
   balance = "৳ ৫,৪২০.৫০", 
   onQRClick,
+  onScanClick,
   onNotificationClick,
   userData
 }: { 
   balance?: string, 
   onQRClick?: () => void,
+  onScanClick?: () => void,
   onNotificationClick?: () => void,
   userData?: UserData
 }) => {

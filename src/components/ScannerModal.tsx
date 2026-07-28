@@ -17,8 +17,8 @@ export const ScannerModal = ({ isOpen, onClose, onScan }: ScannerModalProps) => 
   const handleFileScan = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       import("html5-qrcode").then(({ Html5Qrcode }) => {
-        Html5Qrcode.scanFile(e.target.files![0], false)
-          .then((decodedText) => {
+        (Html5Qrcode as any).scanFile(e.target.files![0], false)
+          .then((decodedText: string) => {
             onScan(decodedText);
           })
           .catch((err) => {
