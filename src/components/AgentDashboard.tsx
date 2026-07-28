@@ -222,7 +222,8 @@ export const AgentDashboard = ({ onBack, onNavigate }: { onBack: () => void; onN
         <div>
           <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">এজেন্ট টুলস</h3>
           <div className="grid grid-cols-4 gap-4">
-            <AgentTool icon={<ArrowUpRight size={20} />} label="ক্যাশ ইন" color="bg-emerald-50 text-emerald-600" />
+            <AgentTool icon={<ArrowUpRight size={20} />} label="ক্যাশ ইন" color="bg-emerald-50 text-emerald-600" onClick={() => onNavigate("cash-in" as Screen)} />
+            <AgentTool icon={<ArrowDownLeft size={20} />} label="ক্যাশ আউট" color="bg-emerald-50 text-emerald-600" onClick={() => onNavigate("cash-out" as Screen)} />
             <AgentTool icon={<ArrowDownLeft size={20} />} label="বি২বি" color="bg-blue-50 text-blue-600" />
             <AgentTool icon={<Users size={20} />} label="ইউজার" color="bg-amber-50 text-amber-600" />
             <AgentTool icon={<DollarSign size={20} />} label="টাকা চান" color="bg-indigo-50 text-indigo-600" onClick={() => onNavigate("admin-request" as Screen)} />

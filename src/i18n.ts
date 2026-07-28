@@ -17,7 +17,8 @@ export const translations: any = {
     confirm_identity: "Confirm your identity",
     id_number: "ID Number",
     phone_number: "Phone Number",
-    save: "Save"
+    save: "Save",
+    password_mismatch: "Passwords do not match!"
   },
   bn: {
     login: "লগইন",
@@ -37,6 +38,7 @@ export const translations: any = {
     confirm_identity: "আপনার পরিচয় নিশ্চিত করুন",
     id_number: "আইডি কার্ড নম্বর",
     phone_number: "ফোন নম্বর",
-    save: "সংরক্ষণ করুন"
+    save: "সংরক্ষণ করুন",
+    password_mismatch: "পাসওয়ার্ড মিলছে না!"
   }
 };

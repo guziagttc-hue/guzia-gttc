@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "motion/react";
 import { useState, useEffect } from "react";
 import { Modal } from "./components/Modal";
+import { ScannerModal } from "./components/ScannerModal";
 import { Header } from "./components/Header";
 import { ServiceGrid } from "./components/ServiceButtons";
 import { RecentTransactions } from "./components/RecentTransactions";
@@ -41,6 +42,8 @@ export default function App() {
     { id: 3, type: "transaction", title: "লেনদেন আপডেট", message: "আপনার ৫,০০০ টাকা সফলভাবে সেন্ড মানি হয়েছে।", time: "৩ ঘণ্টা আগে" },
   ]);
   const [moneyRequests, setMoneyRequests] = useState<any[]>([]);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [scannedIdentifier, setScannedIdentifier] = useState<string | null>(null);
 
   useEffect(() => {
     const savedTransactions = localStorage.getItem("transactions");
@@ -145,8 +148,18 @@ export default function App() {
                       <Header 
                         balance={formatBalance(balance)} 
                         onQRClick={() => updateStep("my-qr")} 
+                        onScanClick={() => setIsScannerOpen(true)}
                         onNotificationClick={() => updateStep("notifications")}
                         userData={userData}
+                      />
+                      <ScannerModal 
+                          isOpen={isScannerOpen} 
+                          onClose={() => setIsScannerOpen(false)} 
+                          onScan={(id) => {
+                              setScannedIdentifier(id);
+                              setIsScannerOpen(false);
+                              updateStep("send-money");
+                          }}
                       />
                       <ServiceGrid 
                         onSendMoney={() => updateStep("send-money")} 
@@ -199,12 +212,17 @@ export default function App() {
 
                   {screen === "send-money" && (
                     <SendMoneyFlow 
+                      initialRecipientIdentifier={scannedIdentifier || undefined}
                       balance={formatBalance(balance)} 
                       addTransaction={addTransaction}
                       userPin={userData.password}
                       senderId={userData.id!}
-                      onCancel={() => updateStep("dashboard")}
+                      onCancel={() => {
+                          setScannedIdentifier(null);
+                          updateStep("dashboard");
+                      }}
                       onComplete={(amount) => {
+                        setScannedIdentifier(null);
                         setBalance(balance - amount);
                         updateStep("dashboard");
                       }}

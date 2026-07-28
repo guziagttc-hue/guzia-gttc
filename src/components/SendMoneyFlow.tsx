@@ -11,10 +11,10 @@ interface Contact {
   isPriyo: boolean;
 }
 
-export const SendMoneyFlow = ({ balance, onComplete, onCancel, addTransaction, userPin, senderId }: { balance: string, onComplete: (newBalance: number) => void, onCancel: () => void, addTransaction: (t: any) => void, userPin: string, senderId: string }) => {
+export const SendMoneyFlow = ({ balance, onComplete, onCancel, addTransaction, userPin, senderId, initialRecipientIdentifier }: { balance: string, onComplete: (newBalance: number) => void, onCancel: () => void, addTransaction: (t: any) => void, userPin: string, senderId: string, initialRecipientIdentifier?: string }) => {
   const [step, setStep] = useState<"input" | "review" | "success">("input");
   const [recipient, setRecipient] = useState<Contact | null>(null);
-  const [manualInput, setManualInput] = useState("");
+  const [manualInput, setManualInput] = useState(initialRecipientIdentifier || "");
   const [amount, setAmount] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");

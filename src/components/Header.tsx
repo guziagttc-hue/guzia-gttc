@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { Eye, QrCode, Bell, User } from "lucide-react";
+import { Eye, QrCode, Bell, User, Zap } from "lucide-react";
 import { useState } from "react";
 import { UserData } from "../types";
 import { useTranslation } from "../context/LanguageContext";
@@ -7,11 +7,13 @@ import { useTranslation } from "../context/LanguageContext";
 export const Header = ({ 
   balance = "৳ ৫,৪২০.৫০", 
   onQRClick,
+  onScanClick,
   onNotificationClick,
   userData
 }: { 
   balance?: string, 
   onQRClick?: () => void,
+  onScanClick?: () => void,
   onNotificationClick?: () => void,
   userData?: UserData
 }) => {
@@ -46,6 +48,12 @@ export const Header = ({
             className="w-9 h-9 bg-white/10 rounded-xl flex justify-center items-center text-amber-400 hover:bg-white/20 transition"
           >
             <QrCode size={18} />
+          </button>
+          <button 
+            onClick={onScanClick}
+            className="w-9 h-9 bg-white/10 rounded-xl flex justify-center items-center text-amber-400 hover:bg-white/20 transition"
+          >
+            <Zap size={18} />
           </button>
           <div className="flex items-center gap-1.5 bg-white/10 pl-2 pr-1 py-1 rounded-full border border-white/10">
             <div className="text-right">

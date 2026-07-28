@@ -14,7 +14,7 @@ export const AuthScreen = ({ onLogin, onRegister }: AuthScreenProps) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
   const [role, setRole] = useState<'user' | 'agent'>('user');
-  const { language, toggleLanguage } = useTranslation();
+  const { language, toggleLanguage, t } = useTranslation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,7 +22,7 @@ export const AuthScreen = ({ onLogin, onRegister }: AuthScreenProps) => {
       await onLogin(email, password);
     } else {
       if (password !== confirmPassword) {
-        alert('পাসওয়ার্ড মিলছে না!');
+        alert(t('password_mismatch')); // Need to add to i18n
         return;
       }
       await onRegister(email, password, name, role);
@@ -41,7 +41,7 @@ export const AuthScreen = ({ onLogin, onRegister }: AuthScreenProps) => {
         <div className="flex flex-col items-center mb-8">
             <img src="/src/assets/images/app_logo_1785137051338.jpg" alt="Shondho Pay Logo" className="w-20 h-20 rounded-2xl mb-4 shadow-sm" />
             <h1 className="text-3xl font-extrabold text-slate-900">Shondho Pay</h1>
-            <p className="text-slate-500 mt-2 text-sm">আপনার সুবিধামতো আর্থিক সেবা</p>
+            <p className="text-slate-500 mt-2 text-sm">{t('login_sub')}</p>
         </div>
         
         <div className="flex bg-slate-100 p-1.5 rounded-2xl mb-8">
@@ -49,13 +49,13 @@ export const AuthScreen = ({ onLogin, onRegister }: AuthScreenProps) => {
             className={`flex-1 py-3 rounded-xl font-semibold transition-all ${activeTab === 'login' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500'}`}
             onClick={() => setActiveTab('login')}
           >
-            লগইন
+            {t('login')}
           </button>
           <button 
             className={`flex-1 py-3 rounded-xl font-semibold transition-all ${activeTab === 'register' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500'}`}
             onClick={() => setActiveTab('register')}
           >
-            রেজিস্ট্রেশন
+            {t('register')}
           </button>
         </div>
         
@@ -63,10 +63,10 @@ export const AuthScreen = ({ onLogin, onRegister }: AuthScreenProps) => {
           {activeTab === 'register' && (
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-slate-700 ml-1">আপনার নাম</label>
+                <label className="text-sm font-semibold text-slate-700 ml-1">{t('name')}</label>
                 <div className="relative">
                     <User className="absolute left-3 top-3.5 text-slate-400" size={18} />
-                    <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full pl-10 p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" placeholder="আপনার নাম লিখুন" required />
+                    <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full pl-10 p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" placeholder={t('name')} required />
                 </div>
               </div>
               
@@ -80,14 +80,14 @@ export const AuthScreen = ({ onLogin, onRegister }: AuthScreenProps) => {
             </div>
           )}
           <div className="space-y-1.5">
-            <label className="text-sm font-semibold text-slate-700 ml-1">ইমেইল</label>
+            <label className="text-sm font-semibold text-slate-700 ml-1">{t('email')}</label>
             <div className="relative">
                 <Mail className="absolute left-3 top-3.5 text-slate-400" size={18} />
                 <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full pl-10 p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" placeholder="example@mail.com" required />
             </div>
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-semibold text-slate-700 ml-1">পাসওয়ার্ড</label>
+            <label className="text-sm font-semibold text-slate-700 ml-1">{t('password')}</label>
             <div className="relative">
                 <Lock className="absolute left-3 top-3.5 text-slate-400" size={18} />
                 <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full pl-10 p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" placeholder="••••••••" required />
@@ -95,7 +95,7 @@ export const AuthScreen = ({ onLogin, onRegister }: AuthScreenProps) => {
           </div>
           {activeTab === 'register' && (
             <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-slate-700 ml-1">কনফার্ম পাসওয়ার্ড</label>
+              <label className="text-sm font-semibold text-slate-700 ml-1">{t('confirm_password')}</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3.5 text-slate-400" size={18} />
                 <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full pl-10 p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" placeholder="••••••••" required />
@@ -103,20 +103,20 @@ export const AuthScreen = ({ onLogin, onRegister }: AuthScreenProps) => {
             </div>
           )}
           <button type="submit" className="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700 transition-all shadow-md hover:shadow-indigo-200 mt-2">
-            {activeTab === 'login' ? 'লগইন করুন' : 'রেজিস্ট্রেশন করুন'}
+            {activeTab === 'login' ? t('login_button') : t('register_button')}
           </button>
         </form>
 
         <div className="mt-6 text-center space-y-3">
           {activeTab === 'login' && (
-            <button className="text-sm text-indigo-600 font-medium">পাসওয়ার্ড ভুলে গেছেন?</button>
+            <button className="text-sm text-indigo-600 font-medium">{t('forgot_password')}</button>
           )}
           <p className="text-xs text-slate-500">
-             লগইন বা রেজিস্ট্রেশন করলে আপনি আমাদের <span className="text-indigo-600 font-medium underline">শর্তাবলি</span> মেনে নিচ্ছেন।
+             {t('terms')}
           </p>
           {activeTab === 'register' && (
             <p className="text-sm text-slate-600">
-              ইতিমধ্যে অ্যাকাউন্ট আছে? <button onClick={() => setActiveTab('login')} className="text-indigo-600 font-bold">লগইন করুন</button>
+              {t('has_account')} <button onClick={() => setActiveTab('login')} className="text-indigo-600 font-bold">{t('login')}</button>
             </p>
           )}
         </div>

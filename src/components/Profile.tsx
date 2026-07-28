@@ -234,9 +234,11 @@ export const Profile = ({
           <div className="bg-white rounded-[32px] overflow-hidden shadow-sm border border-slate-100">
              <ProfileMenuItem icon={<ShieldCheck size={18} />} label="নিরাপত্তা ও পিন পরিবর্তন" color="text-emerald-500" />
              <ProfileMenuItem icon={<Award size={18} />} label="রেফার করুন ও আয় করুন" color="text-amber-500" />
-             <button onClick={toggleLanguage} className="w-full">
-                <ProfileMenuItem label={`ভাষা: ${language === 'bn' ? 'বাংলা' : 'English'}`} color="text-blue-500" />
-             </button>
+             <ProfileMenuItem 
+                onClick={toggleLanguage} 
+                label={`ভাষা: ${language === 'bn' ? 'বাংলা' : 'English'}`} 
+                color="text-blue-500" 
+             />
              <ProfileMenuItem icon={<HelpCircle size={18} />} label="হেল্প ও কাস্টমার সাপোর্ট" color="text-indigo-500" />
           </div>
         </div>
@@ -258,8 +260,8 @@ export const Profile = ({
   );
 };
 
-const ProfileMenuItem = ({ icon, label, color }: { icon?: React.ReactNode, label: string, color: string }) => (
-  <button className="w-full flex items-center justify-between p-4 hover:bg-slate-50 transition border-b border-slate-50 last:border-0 group">
+const ProfileMenuItem = ({ icon, label, color, onClick }: { icon?: React.ReactNode, label: string, color: string, onClick?: () => void }) => (
+  <button onClick={onClick} className="w-full flex items-center justify-between p-4 hover:bg-slate-50 transition border-b border-slate-50 last:border-0 group">
     <div className="flex items-center gap-4">
       {icon && (
         <div className={`w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center ${color} group-hover:scale-110 transition`}>

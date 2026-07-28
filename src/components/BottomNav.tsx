@@ -56,7 +56,7 @@ export const BottomNav = ({
         </div>
       </div>
 
-      <ScannerModal isOpen={isScannerOpen} onClose={() => setIsScannerOpen(false)} />
+      <ScannerModal isOpen={isScannerOpen} onClose={() => setIsScannerOpen(false)} onScan={() => {}} />
     </>
   );
 };
