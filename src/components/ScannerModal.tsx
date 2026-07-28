@@ -10,8 +10,24 @@ interface ScannerModalProps {
 
 export const ScannerModal = ({ isOpen, onClose, onScan }: ScannerModalProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const handleFileScan = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      import("html5-qrcode").then(({ Html5Qrcode }) => {
+        Html5Qrcode.scanFile(e.target.files![0], false)
+          .then((decodedText) => {
+            onScan(decodedText);
+          })
+          .catch((err) => {
+            console.error("Gallery scan error:", err);
+            setError("কিউআর কোড খুঁজে পাওয়া যায়নি।");
+          });
+      });
+    }
+  };
   
   useEffect(() => {
     import("html5-qrcode").then(({ Html5QrcodeScanner }) => {
@@ -70,11 +86,21 @@ export const ScannerModal = ({ isOpen, onClose, onScan }: ScannerModalProps) => 
               </div>
               <span className="text-xs font-bold">ফ্ল্যাশ</span>
             </button>
-            <button className="flex flex-col items-center gap-2 group">
+            <button 
+                onClick={() => fileInputRef.current?.click()}
+                className="flex flex-col items-center gap-2 group"
+            >
               <div className="w-14 h-14 bg-white/10 rounded-full flex justify-center items-center group-hover:bg-white/20 transition">
                 <ImageIcon size={24} />
               </div>
               <span className="text-xs font-bold">গ্যালারি</span>
+              <input 
+                ref={fileInputRef}
+                type="file" 
+                accept="image/*" 
+                className="hidden" 
+                onChange={handleFileScan}
+              />
             </button>
           </div>
         </motion.div>

@@ -6,14 +6,14 @@ import { ScannerModal } from "./ScannerModal";
 export const BottomNav = ({ 
   onAgentClick, 
   onProfileClick,
-  onHistoryClick 
+  onHistoryClick,
+  onScanClick
 }: { 
   onAgentClick?: () => void, 
   onProfileClick?: () => void,
-  onHistoryClick?: () => void
+  onHistoryClick?: () => void,
+  onScanClick?: () => void
 }) => {
-  const [isScannerOpen, setIsScannerOpen] = useState(false);
-
   return (
     <>
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-full max-w-lg px-4 z-50">
@@ -31,7 +31,7 @@ export const BottomNav = ({
           <div className="relative -translate-y-5">
             <motion.button 
               whileTap={{ scale: 0.9 }}
-              onClick={() => setIsScannerOpen(true)}
+              onClick={onScanClick}
               className="w-14 h-14 bg-[#0b2240] rounded-full flex justify-center items-center text-white shadow-xl border-4 border-white hover:bg-[#122e54] transition"
             >
               <QrCode size={24} />
@@ -55,8 +55,6 @@ export const BottomNav = ({
           </button>
         </div>
       </div>
-
-      <ScannerModal isOpen={isScannerOpen} onClose={() => setIsScannerOpen(false)} onScan={() => {}} />
     </>
   );
 };

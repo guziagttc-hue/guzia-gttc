@@ -152,15 +152,15 @@ export default function App() {
                         onNotificationClick={() => updateStep("notifications")}
                         userData={userData}
                       />
-                      <ScannerModal 
-                          isOpen={isScannerOpen} 
-                          onClose={() => setIsScannerOpen(false)} 
-                          onScan={(id) => {
-                              setScannedIdentifier(id);
-                              setIsScannerOpen(false);
-                              updateStep("send-money");
-                          }}
-                      />
+      <ScannerModal 
+          isOpen={isScannerOpen} 
+          onClose={() => setIsScannerOpen(false)} 
+          onScan={(id) => {
+              setScannedIdentifier(id);
+              setIsScannerOpen(false);
+              updateStep("send-money");
+          }}
+      />
                       <ServiceGrid 
                         onSendMoney={() => updateStep("send-money")} 
                         onCashOut={() => updateStep("cash-out")}
@@ -173,6 +173,7 @@ export default function App() {
                         onAgentClick={() => updateStep("agent-dashboard")} 
                         onProfileClick={() => updateStep("profile")}
                         onHistoryClick={() => updateStep("transaction-history")}
+                        onScanClick={() => setIsScannerOpen(true)}
                       />
                     </motion.div>
                   )}
@@ -188,6 +189,7 @@ export default function App() {
                         onAgentClick={() => updateStep("agent-dashboard")} 
                         onProfileClick={() => updateStep("profile")}
                         onHistoryClick={() => updateStep("transaction-history")}
+                        onScanClick={() => setIsScannerOpen(true)}
                       />
                     </motion.div>
                   )}

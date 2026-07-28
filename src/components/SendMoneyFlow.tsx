@@ -20,6 +20,12 @@ export const SendMoneyFlow = ({ balance, onComplete, onCancel, addTransaction, u
   const [error, setError] = useState("");
   const [txnId] = useState(`txn${Math.random().toString(36).substr(2, 9)}`);
 
+  useEffect(() => {
+    if (initialRecipientIdentifier) {
+      handleNext();
+    }
+  }, []);
+
   const charge = recipient?.isPriyo ? 0 : 5;
   const numAmount = parseFloat(amount) || 0;
   const total = numAmount + charge;
