@@ -8,10 +8,20 @@ export const MyQR = ({ name, identifier, onBack }: { name: string, identifier: s
 
   const handleDownload = () => {
     if (!qrRef.current) return;
+    const svg = qrRef.current.querySelector('svg');
+    if (!svg) return;
+
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const blob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
     
-    // In a real browser environment, we'd use html2canvas or similar to convert the div to a canvas/image.
-    // For this context, we'll simulate the download process or provide a simpler approach.
-    alert("QR কোড ডাউনলোড শুরু হচ্ছে...");
+    const downloadLink = document.createElement("a");
+    downloadLink.href = url;
+    downloadLink.download = "my-qr-code.svg";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+    URL.revokeObjectURL(url);
   };
 
   const handleShare = async () => {
