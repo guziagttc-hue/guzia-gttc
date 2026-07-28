@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "motion/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Modal } from "./components/Modal";
+import { PinLockModal } from "./components/PinLockModal";
 import { ScannerModal } from "./components/ScannerModal";
 import { Header } from "./components/Header";
 import { ServiceGrid } from "./components/ServiceButtons";
@@ -44,6 +45,32 @@ export default function App() {
   const [moneyRequests, setMoneyRequests] = useState<any[]>([]);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [scannedIdentifier, setScannedIdentifier] = useState<string | null>(null);
+  const [isLocked, setIsLocked] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const resetTimer = () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+        if (localStorage.getItem("isLoggedIn") === "true") {
+            setIsLocked(true);
+        }
+    }, 5 * 60 * 1000); // 5 minutes
+  };
+
+  useEffect(() => {
+    window.addEventListener('mousemove', resetTimer);
+    window.addEventListener('keydown', resetTimer);
+    window.addEventListener('click', resetTimer);
+    
+    resetTimer();
+
+    return () => {
+        window.removeEventListener('mousemove', resetTimer);
+        window.removeEventListener('keydown', resetTimer);
+        window.removeEventListener('click', resetTimer);
+        if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     const savedTransactions = localStorage.getItem("transactions");
@@ -100,6 +127,7 @@ export default function App() {
     <LanguageProvider>
         <div className="bg-slate-50 min-h-screen flex justify-center text-slate-800 font-sans">
             <Modal {...modal} onClose={() => setModal({ ...modal, isOpen: false })} />
+            <PinLockModal isOpen={isLocked} correctPin={userData.password} onUnlock={() => { setIsLocked(false); resetTimer(); }} />
             <div className="w-full max-w-lg bg-white min-h-screen relative flex flex-col shadow-sm overflow-hidden">
                 <AnimatePresence mode="wait">
                   {screen === "login" && (

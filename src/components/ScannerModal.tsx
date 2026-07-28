@@ -79,7 +79,7 @@ export const ScannerModal = ({ isOpen, onClose, onScan }: ScannerModalProps) => 
           </div>
 
           {/* Bottom Actions */}
-          <div className="p-10 pb-16 flex justify-center gap-12 text-white">
+          <div className="p-10 pb-16 flex justify-evenly items-center text-white">
             <button className="flex flex-col items-center gap-2 group">
               <div className="w-14 h-14 bg-white/10 rounded-full flex justify-center items-center group-hover:bg-white/20 transition">
                 <Zap size={24} />
